@@ -4,6 +4,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Marsman.ReallySimpleDocumentation</RootNamespace>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>Marsman</Authors>
+    <PackageId>Marsman.ReallySimpleDocumentation</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
