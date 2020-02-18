@@ -7,6 +7,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Marsman</Authors>
     <PackageId>Marsman.ReallySimpleDocumentation</PackageId>
+    <Authors>Dan Mann</Authors>
+    <Company>Marsman</Company>
+    <Product>Marsman.ReallySimpleDocumentation</Product>
+    <PackageProjectUrl>https://github.com/DanMannMann/ReallySimpleDocumentation</PackageProjectUrl>
+    <PackageIconUrl>https://umbracocodefirstdocs.azurewebsites.net/icons/marsman.png</PackageIconUrl>
+    <RepositoryUrl>https://github.com/DanMannMann/ReallySimpleDocumentation</RepositoryUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
