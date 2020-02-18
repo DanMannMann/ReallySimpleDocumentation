@@ -1,0 +1,112 @@
+﻿.wiki-container {
+	width: 100%;
+	display: flex;
+	align-items: flex-start;
+}
+
+.wiki-nav-bar {
+	width: 10%;
+	min-width: 150px;
+	max-width: 300px;
+	position: sticky;
+	top: 0;
+}
+
+.wiki-nav-bar-section-header {
+    display: block;
+    padding: 8px 22px;
+    margin: 0;
+    cursor: pointer;
+    background-color: #a9cff5 !important;
+    border-color: #61b0fe !important;
+    font-size: 0.95em !important;
+    text-decoration: none !important;
+    color: #FFF !important;
+    transition: ease .5s;
+}
+
+.wiki-nav-bar-item-wrapper {
+    padding-left: 10px;
+    border: 1px solid #a9cff5;
+    border-right: 0px;
+}
+
+.content-title {
+    color: #2e8ef0;
+    font-size: 1.1em;
+}
+
+.wiki-nav-bar-item {
+    margin: 0;
+    cursor: pointer;
+    display: block;
+    padding: 8px 22px;
+    background-color: #61b0fe !important;
+    border-color: #61b0fe;
+    font-size: 0.95em !important;
+    text-decoration: none !important;
+    color: #FFF !important;
+    transition: ease .5s;
+}
+
+.wiki-nav-bar-item:hover {
+	background-color: #aed0f2;
+}
+
+.wiki-content-area {
+	width: 90%;
+}
+
+.wiki-content {
+    background-color: #fafafa;
+    padding: 10px 25px;
+    border-top: 1px solid #61b0fe;
+    border-bottom: 1px solid #61b0fe;
+    margin: 0;
+}
+
+.wiki-content + .wiki-content {
+	border-top-width: 0px;
+}
+
+.swagger-ui .info {
+    margin: 0;
+    margin-top: 10px;
+}
+
+.swagger-ui .topbar {
+    background-color: #2e8ef0;
+}
+
+.hide-in-swagger {
+    display: none;
+}
+
+.topbar .wrapper .topbar-wrapper a.link {
+    max-width: unset;
+    flex: unset;
+}
+
+.topbar .wrapper .topbar-wrapper a.link span {
+    visibility: hidden;
+}
+
+.topbar .wrapper .topbar-wrapper a.link span::before {
+    content: '{{ApiTitle}}';
+    margin-top: -5px;
+    font-size: 70%;
+    display: inline;
+    visibility: visible;
+}
+
+.topbar .wrapper .topbar-wrapper a.link img {
+    content: url("{{LogoUrl}}");
+    width: 150px;
+    height: auto;
+    background-color: {{LogoBackgroundColor}};
+    border-radius: 10px;
+    padding-left: 10px;
+    padding-right: 8px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
