@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Linq;
 
 namespace Marsman.ReallySimpleDocumentation
 {

@@ -5,38 +5,44 @@
     <LangVersion>latest</LangVersion>
     <RootNamespace>Marsman.ReallySimpleDocumentation</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Marsman</Authors>
     <PackageId>Marsman.ReallySimpleDocumentation</PackageId>
-    <Authors>Dan Mann</Authors>
+    <Authors>Marsman</Authors>
     <Company>Marsman</Company>
     <Product>Marsman.ReallySimpleDocumentation</Product>
     <PackageProjectUrl>https://github.com/DanMannMann/ReallySimpleDocumentation</PackageProjectUrl>
     <PackageIconUrl>https://umbracocodefirstdocs.azurewebsites.net/icons/marsman.png</PackageIconUrl>
     <RepositoryUrl>https://github.com/DanMannMann/ReallySimpleDocumentation</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <Version>1.0.7</Version>
+    <AssemblyVersion>1.0.7.0</AssemblyVersion>
+    <FileVersion>1.0.7.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Templates\redoc-custom.css" />
     <None Remove="Templates\redoc-custom.js" />
+    <None Remove="Templates\redoc.css" />
     <None Remove="Templates\redoc.html" />
+    <None Remove="Templates\redoc.js" />
     <None Remove="Templates\SwaggerContentTemplate.html" />
     <None Remove="Templates\SwaggerNavBarHeadingTemplate.html" />
     <None Remove="Templates\SwaggerNavBarItemTemplate.html" />
     <None Remove="Templates\swaggerui-custom.css" />
     <None Remove="Templates\swaggerui-custom.js" />
+    <None Remove="Templates\swaggerui.css" />
+    <None Remove="Templates\swaggerui.js" />
     <None Remove="Templates\SwaggerWikiTemplate.html" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Templates\redoc-custom.css" />
-    <EmbeddedResource Include="Templates\redoc-custom.js" />
+    <EmbeddedResource Include="Templates\redoc.css" />
     <EmbeddedResource Include="Templates\redoc.html" />
+    <EmbeddedResource Include="Templates\redoc.js" />
     <EmbeddedResource Include="Templates\SwaggerNavBarItemTemplate.html" />
     <EmbeddedResource Include="Templates\SwaggerContentTemplate.html" />
-    <EmbeddedResource Include="Templates\swaggerui-custom.css" />
-    <EmbeddedResource Include="Templates\swaggerui-custom.js" />
     <EmbeddedResource Include="Templates\SwaggerNavBarHeadingTemplate.html" />
+    <EmbeddedResource Include="Templates\swaggerui.css" />
+    <EmbeddedResource Include="Templates\swaggerui.js" />
     <EmbeddedResource Include="Templates\SwaggerWikiTemplate.html" />
   </ItemGroup>
 

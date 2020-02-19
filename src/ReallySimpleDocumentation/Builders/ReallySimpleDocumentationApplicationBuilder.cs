@@ -19,11 +19,11 @@ namespace Marsman.ReallySimpleDocumentation
 {
     public class ReallySimpleDocumentationApplicationBuilder
     {
-        private const string SwaggerUiDefaultJsResourceName = "ReallySimpleDocumentation.Templates.swaggerui-custom.js";
-        private const string SwaggerUiDefaultCssResourceName = "ReallySimpleDocumentation.Templates.swaggerui-custom.css";
-        private const string RedocDefaultHtmlResourceName = "ReallySimpleDocumentation.Templates.redoc.html";
-        private const string RedocDefaultJsResourceName = "ReallySimpleDocumentation.Templates.redoc-custom.js";
-        private const string RedocDefaultCssResourceName = "ReallySimpleDocumentation.Templates.redoc-custom.css";
+        private const string SwaggerUiDefaultJsResourceName = "Marsman.ReallySimpleDocumentation.Templates.swaggerui.js";
+        private const string SwaggerUiDefaultCssResourceName = "Marsman.ReallySimpleDocumentation.Templates.swaggerui.css";
+        private const string RedocDefaultHtmlResourceName = "Marsman.ReallySimpleDocumentation.Templates.redoc.html";
+        private const string RedocDefaultJsResourceName = "Marsman.ReallySimpleDocumentation.Templates.redoc.js";
+        private const string RedocDefaultCssResourceName = "Marsman.ReallySimpleDocumentation.Templates.redoc.css";
         private readonly IApplicationBuilder app;
         private readonly SwaggerDocOptions options;
 
@@ -63,7 +63,7 @@ namespace Marsman.ReallySimpleDocumentation
 
             if (config.ServeDefaultCss)
             {
-                var cssRouteTemplate = config.CssUrl.Trim('/');
+                var cssRouteTemplate = config.DefaultCssRoute.Trim('/');
                 var defaultCss = string.Empty;
                 using (var stream = assembly.GetManifestResourceStream(RedocDefaultCssResourceName))
                 using (var reader = new StreamReader(stream))
@@ -85,7 +85,7 @@ namespace Marsman.ReallySimpleDocumentation
 
             if (config.ServeDefaultJavascript)
             {
-                var jsRouteTemplate = config.JavascriptUrl.Trim('/');
+                var jsRouteTemplate = config.DefaultJavascriptRoute.Trim('/');
                 var defaultJs = string.Empty;
                 using (var stream = assembly.GetManifestResourceStream(RedocDefaultJsResourceName))
                 using (var reader = new StreamReader(stream))
@@ -116,7 +116,7 @@ namespace Marsman.ReallySimpleDocumentation
 
             if (config.ServeDefaultCss)
             {
-                var cssRouteTemplate = config.CssUrl.StartsWith("/") ? config.CssUrl.Trim('/') : $"swagger/{config.CssUrl}";
+                var cssRouteTemplate = config.DefaultCssRoute.StartsWith("/") ? config.DefaultCssRoute.Trim('/') : $"swagger/{config.DefaultCssRoute}";
                 var defaultCss = string.Empty;
                 using (var stream = assembly.GetManifestResourceStream(SwaggerUiDefaultCssResourceName))
                 using (var reader = new StreamReader(stream))
@@ -138,7 +138,7 @@ namespace Marsman.ReallySimpleDocumentation
             
             if (config.ServeDefaultJavascript)
             {
-                var jsRouteTemplate = config.JavascriptUrl.StartsWith("/") ? config.JavascriptUrl.Trim('/') : $"swagger/{config.JavascriptUrl}";
+                var jsRouteTemplate = config.DefaultJavascriptRoute.StartsWith("/") ? config.DefaultJavascriptRoute.Trim('/') : $"swagger/{config.DefaultJavascriptRoute}";
                 var defaultJs = string.Empty;
                 using (var stream = assembly.GetManifestResourceStream(SwaggerUiDefaultJsResourceName))
                 using (var reader = new StreamReader(stream))
@@ -160,8 +160,10 @@ namespace Marsman.ReallySimpleDocumentation
 
             app.UseSwaggerUI(c =>
             {
-                if (!string.IsNullOrWhiteSpace(config.CssUrl)) c.InjectStylesheet(config.CssUrl);
-                if (!string.IsNullOrWhiteSpace(config.JavascriptUrl)) c.InjectJavascript(config.JavascriptUrl);
+                if (config.ServeDefaultCss) c.InjectStylesheet(config.DefaultCssRoute);
+                if (config.ServeDefaultJavascript) c.InjectJavascript(config.DefaultJavascriptRoute);
+                foreach (var css in config.AdditionalStylesheets) c.InjectStylesheet(css);
+                foreach (var js in config.AdditionalJavascript) c.InjectJavascript(js);
                 if (!string.IsNullOrWhiteSpace(config.FaviconUrl)) c.HeadContent += $@"<link rel='icon' href='{config.FaviconUrl}'>";
                 c.SwaggerEndpoint($"/swaggerui/{options.ShortName}/swagger.json", options.Title);
                 c.DocumentTitle = options.Title;

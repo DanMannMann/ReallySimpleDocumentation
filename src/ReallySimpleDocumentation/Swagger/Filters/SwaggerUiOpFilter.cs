@@ -6,11 +6,11 @@ using System.Linq;
 
 namespace Marsman.ReallySimpleDocumentation
 {
-    public class SwaggerUiOpFilter : IOperationFilter
+    public class SwaggerUIOpFilter : IOperationFilter
     {
         private readonly IHttpContextAccessor hcx;
 
-        public SwaggerUiOpFilter(IHttpContextAccessor hcx)
+        public SwaggerUIOpFilter(IHttpContextAccessor hcx)
         {
             this.hcx = hcx ?? throw new System.ArgumentNullException(nameof(hcx));
         }

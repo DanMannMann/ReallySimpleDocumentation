@@ -1,6 +1,6 @@
 ﻿namespace Marsman.ReallySimpleDocumentation
 {
-    public interface ISwaggerUiWikiFactory
+    public interface ISwaggerUIWikiFactory
     {
         string GetWikiHtmlSection();
     }

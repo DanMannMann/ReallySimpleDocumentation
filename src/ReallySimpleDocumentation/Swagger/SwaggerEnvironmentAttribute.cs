@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Marsman.ReallySimpleDocumentation
 {
@@ -9,11 +11,11 @@ namespace Marsman.ReallySimpleDocumentation
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
     public class SwaggerEnvironmentAttribute : Attribute
     {
-        public SwaggerEnvironmentAttribute(SwaggerEnvironment allowedEnvironments)
+        public SwaggerEnvironmentAttribute(params string[] allowedEnvironments)
         {
-            AllowedEnvironments = allowedEnvironments;
+            AllowedEnvironments = allowedEnvironments.ToList();
         }
 
-        public SwaggerEnvironment AllowedEnvironments { get; }
+        public IEnumerable<string> AllowedEnvironments { get; }
     }
 }

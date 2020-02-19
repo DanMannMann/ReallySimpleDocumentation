@@ -1,26 +1,25 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Swashbuckle.AspNetCore.Swagger;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace Marsman.ReallySimpleDocumentation
 {
-    public class SwaggerApiFilterConvention : IControllerModelConvention
+    public class SwaggerEnvironmentFilterConvention : IControllerModelConvention
     {
-        private readonly SwaggerEnvironment environment;
-        private readonly bool? defaultVisible;
+        private readonly bool? defaultToVisible;
+        private readonly StringComparer matchType;
+        private readonly string environment;
 
-        public SwaggerApiFilterConvention(string env, bool? defaultVisible = null)
+        public SwaggerEnvironmentFilterConvention(string environment, bool? defaultToVisible = null, bool caseSensitiveMatch = false)
         {
-            if (!Enum.TryParse(env, true, out environment)) throw new InvalidOperationException("unknown enum value");
-            this.defaultVisible = defaultVisible;
-        }
-
-        public SwaggerApiFilterConvention(string env, Func<SwaggerEnvironment, bool> defaultVisible)
-        {
-            if (!Enum.TryParse(env, true, out environment)) throw new InvalidOperationException("unknown enum value");
-            this.defaultVisible = defaultVisible(environment);
+            this.environment = environment ?? throw new ArgumentNullException(nameof(environment));
+            this.defaultToVisible = defaultToVisible;
+            this.matchType = caseSensitiveMatch ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
         }
 
         public void Apply(ControllerModel controller)
@@ -29,7 +28,7 @@ namespace Marsman.ReallySimpleDocumentation
                                     .OfType<SwaggerEnvironmentAttribute>()
                                     .FirstOrDefault()?
                                     .AllowedEnvironments
-                                    .HasFlag(environment) ?? defaultVisible;
+                                    .Contains(environment, matchType) ?? defaultToVisible;
 
             if (visible.HasValue)
             {
@@ -55,7 +54,7 @@ namespace Marsman.ReallySimpleDocumentation
                                 .OfType<SwaggerEnvironmentAttribute>()
                                 .FirstOrDefault()?
                                 .AllowedEnvironments
-                                .HasFlag(environment) ?? defaultVisible;
+                                .Contains(environment, matchType) ?? defaultToVisible;
 
             if (visible.HasValue)
             {

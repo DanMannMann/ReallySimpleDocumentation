@@ -1,13 +1,18 @@
-﻿namespace Marsman.ReallySimpleDocumentation
+﻿using System.Collections.Generic;
+
+namespace Marsman.ReallySimpleDocumentation
 {
     public interface IUIOptions
     {
-
-        public string FaviconUrl { get; set; }
-        public string LogoUrl { get; set; }
-        public string LogoAltText { get; set; }
-        public string LogoBackgroundColor { get; set; }
-        public string JavascriptUrl { get; set; }
-        public string CssUrl { get; set; }
+        string FaviconUrl { get; set; }
+        string LogoUrl { get; set; }
+        string LogoAltText { get; set; }
+        string LogoBackgroundColor { get; set; }
+        public List<string> AdditionalStylesheets { get; }
+        public List<string> AdditionalJavascript { get; }
+        string DefaultJavascriptRoute { get; set; }
+        string DefaultCssRoute { get; set; }
+        bool ServeDefaultJavascript { get; set; }
+        bool ServeDefaultCss { get; set; }
     }
 }

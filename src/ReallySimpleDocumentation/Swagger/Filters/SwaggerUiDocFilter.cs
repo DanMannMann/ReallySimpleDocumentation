@@ -4,12 +4,12 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Marsman.ReallySimpleDocumentation
 {
-    public class SwaggerUiDocFilter : IDocumentFilter
+    public class SwaggerUIDocFilter : IDocumentFilter
     {
         private readonly IHttpContextAccessor hcx;
-        private readonly ISwaggerUiWikiFactory wikiFactory;
+        private readonly ISwaggerUIWikiFactory wikiFactory;
 
-        public SwaggerUiDocFilter(IHttpContextAccessor hcx, ISwaggerUiWikiFactory wikiFactory)
+        public SwaggerUIDocFilter(IHttpContextAccessor hcx, ISwaggerUIWikiFactory wikiFactory)
         {
             this.hcx = hcx;
             this.wikiFactory = wikiFactory;
@@ -22,9 +22,12 @@ namespace Marsman.ReallySimpleDocumentation
             {
                 swaggerDoc.Info.Title = string.Empty;
                 swaggerDoc.Info.Description = wikiFactory.GetWikiHtmlSection();
-                foreach (var tag in swaggerDoc.Tags)
+                if (swaggerDoc.Tags != null)
                 {
-                    tag.Description = SwaggerUiOpFilter.Fold(tag.Description);
+                    foreach (var tag in swaggerDoc.Tags)
+                    {
+                        tag.Description = SwaggerUIOpFilter.Fold(tag.Description);
+                    }
                 }
             }
         }

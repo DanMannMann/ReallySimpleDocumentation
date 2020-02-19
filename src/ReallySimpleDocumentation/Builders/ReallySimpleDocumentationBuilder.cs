@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -42,11 +43,11 @@ namespace Marsman.ReallySimpleDocumentation
             swaggerUiOptions?.Invoke(options);
             services.AddSingleton(Options.Create(options));
             services.AddSingleton(Options.Create(options.WikiOptions));
-            services.AddSingleton<ISwaggerUiWikiFactory, SwaggerUiWikiFactory>();
+            services.AddSingleton<ISwaggerUIWikiFactory, SwaggerUIWikiFactory>();
             services.Configure<SwaggerGenOptions>(c =>
             {
-                c.DocumentFilter<SwaggerUiDocFilter>();
-                c.OperationFilter<SwaggerUiOpFilter>();
+                c.DocumentFilter<SwaggerUIDocFilter>();
+                c.OperationFilter<SwaggerUIOpFilter>();
             });
             return this;
         }
@@ -89,28 +90,37 @@ namespace Marsman.ReallySimpleDocumentation
             });
         }
 
-        public ReallySimpleDocumentationBuilder AdditionalSwaggerConfig(Action<SwaggerGenOptions> options)
+        public ReallySimpleDocumentationBuilder WithAdditionalSwaggerConfig(Action<SwaggerGenOptions> options)
         {
             services.Configure(options);
             return this;
         }
 
-        public ReallySimpleDocumentationBuilder AddAuthentication(string authAuthority, string clientId, string clientName)
+        public ReallySimpleDocumentationBuilder WithEnvironmentFilter(string environment, bool? defaultToVisible = null, bool caseSensitiveMatch = false)
         {
-            return AddAuthentication(authAuthority, clientId, clientName, new Dictionary<string,string>());
+            services.Configure<MvcOptions>(opts =>
+            {
+                opts.Conventions.Add(new SwaggerEnvironmentFilterConvention(environment, defaultToVisible, caseSensitiveMatch));
+            });
+            return this;
         }
 
-        public ReallySimpleDocumentationBuilder WithAuthentication(string authAuthority, string clientId, string clientName, params string[] scopes)
+        public ReallySimpleDocumentationBuilder WithOAuth2Authentication(string authAuthority, string clientId, string clientName)
         {
-            return AddAuthentication(authAuthority, clientId, clientName, scopes.ToDictionary(x => x, x => x));
+            return WithOAuth2Authentication(authAuthority, clientId, clientName, new Dictionary<string,string>());
         }
 
-        public ReallySimpleDocumentationBuilder AddAuthentication(string authAuthority, string clientId, string clientName, params (string key, string value)[] scopes)
+        public ReallySimpleDocumentationBuilder WithOAuth2Authentication(string authAuthority, string clientId, string clientName, params string[] scopes)
         {
-            return AddAuthentication(authAuthority, clientId, clientName, scopes.ToDictionary(x => x.key, x => x.value));
+            return WithOAuth2Authentication(authAuthority, clientId, clientName, scopes.ToDictionary(x => x, x => x));
         }
 
-        public ReallySimpleDocumentationBuilder AddAuthentication(string authAuthority, string clientId, string clientName, IDictionary<string,string> scopes)
+        public ReallySimpleDocumentationBuilder WithOAuth2Authentication(string authAuthority, string clientId, string clientName, params (string key, string value)[] scopes)
+        {
+            return WithOAuth2Authentication(authAuthority, clientId, clientName, scopes.ToDictionary(x => x.key, x => x.value));
+        }
+
+        public ReallySimpleDocumentationBuilder WithOAuth2Authentication(string authAuthority, string clientId, string clientName, IDictionary<string,string> scopes)
         {
             services.Configure<AuthOptions>(opts =>
             {

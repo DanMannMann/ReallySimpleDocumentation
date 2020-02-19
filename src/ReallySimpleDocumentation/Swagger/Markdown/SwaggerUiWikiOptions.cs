@@ -3,15 +3,15 @@ using System.IO;
 
 namespace Marsman.ReallySimpleDocumentation
 {
-    public class SwaggerUiWikiOptions
+    public class SwaggerUIWikiOptions
     {
         private const string SwaggerContentTemplateResourceName = "Marsman.ReallySimpleDocumentation.Templates.SwaggerContentTemplate.html";
         private const string SwaggerNavBarItemTemplateResourceName = "Marsman.ReallySimpleDocumentation.Templates.SwaggerNavBarItemTemplate.html";
         private const string SwaggerNavBarHeadingTemplateResourceName = "Marsman.ReallySimpleDocumentation.Templates.SwaggerNavBarHeadingTemplate.html";
         private const string SwaggerWikiTemplateResourceName = "Marsman.ReallySimpleDocumentation.Templates.SwaggerWikiTemplate.html";
-        private static Lazy<SwaggerUiWikiOptions> defaults = new Lazy<SwaggerUiWikiOptions>(() =>
+        private static Lazy<SwaggerUIWikiOptions> defaults = new Lazy<SwaggerUIWikiOptions>(() =>
         {
-            var assembly = typeof(SwaggerUiWikiOptions).Assembly;
+            var assembly = typeof(SwaggerUIWikiOptions).Assembly;
             var swaggerContentTemplate = string.Empty;
             using (var stream = assembly.GetManifestResourceStream(SwaggerContentTemplateResourceName))
             using (var reader = new StreamReader(stream))
@@ -40,7 +40,7 @@ namespace Marsman.ReallySimpleDocumentation
                 swaggerWikiTemplate = reader.ReadToEnd();
             }
 
-            return new SwaggerUiWikiOptions
+            return new SwaggerUIWikiOptions
             {
                 MainTemplate = swaggerWikiTemplate,
                 NavBarHeadingTemplate = navHeaderTemplate,

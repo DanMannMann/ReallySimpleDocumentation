@@ -7,14 +7,14 @@ using System.Text;
 
 namespace Marsman.ReallySimpleDocumentation
 {
-    public class SwaggerUiWikiFactory : ISwaggerUiWikiFactory
+    public class SwaggerUIWikiFactory : ISwaggerUIWikiFactory
     {
         private Lazy<string> wikiHtmlSection;
 
-        private SwaggerUiWikiOptions options;
+        private SwaggerUIWikiOptions options;
         private readonly IWikiMarkdownHandler markdownHandler;
 
-        public SwaggerUiWikiFactory(IWikiMarkdownHandler markdownHandler, IOptions<SwaggerUiWikiOptions> options)
+        public SwaggerUIWikiFactory(IWikiMarkdownHandler markdownHandler, IOptions<SwaggerUIWikiOptions> options)
         {
             this.options = options?.Value ?? throw new ArgumentNullException(nameof(options));
             this.wikiHtmlSection = new Lazy<string>(BuildWikiHtmlSection);

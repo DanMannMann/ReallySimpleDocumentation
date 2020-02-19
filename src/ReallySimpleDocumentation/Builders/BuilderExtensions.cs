@@ -10,11 +10,17 @@ using System.Text;
 
 namespace Marsman.ReallySimpleDocumentation
 {
-
     public static class BuilderExtensions
     {
         internal static string ReplaceApiTemplateVariables(this string input, IUIOptions config, SwaggerDocOptions options)
         {
+            var css = new List<string>(config.AdditionalStylesheets.Where(x => !string.IsNullOrWhiteSpace(x)));
+            var js = new List<string>(config.AdditionalJavascript.Where(x => !string.IsNullOrWhiteSpace(x)));
+            if (config.ServeDefaultCss) css.Add(config.DefaultCssRoute);
+            if (config.ServeDefaultJavascript) js.Add(config.DefaultJavascriptRoute);
+            css = css.Select(x => $"<link rel='stylesheet' href='{x}'>").ToList();
+            js = css.Select(x => $"<script src='{x}'></script>").ToList();
+
             return input.Replace("{{ApiShortName}}", options.ShortName)
                         .Replace("{{ApiTitle}}", options.Title)
                         .Replace("{{ApiDescription}}", options.DefaultDescription)
@@ -22,29 +28,10 @@ namespace Marsman.ReallySimpleDocumentation
                         .Replace("{{LogoUrl}}", config.LogoUrl)
                         .Replace("{{LogoAltText}}", config.LogoAltText)
                         .Replace("{{LogoBackgroundColor}}", config.LogoBackgroundColor)
-                        .Replace("{{RedocCustomCssUrl}}", config.CssUrl)
-                        .Replace("{{RedocCustomJsUrl}}", config.JavascriptUrl);
-        }
-
-        public static void AddRange<T>(this List<T> list, params T[] items)
-        {
-            list.AddRange(items);
-        }
-
-        public static void AddRange<T1, T2>(this Dictionary<T1,T2> dict, params (T1 key, T2 value)[] items)
-        {
-            foreach (var item in items)
-            {
-                dict.Add(item.key, item.value);
-            }
-        }
-
-        public static void AddRange<T1, T2>(this Dictionary<T1, T2> dict, IEnumerable<KeyValuePair<T1,T2>> items)
-        {
-            foreach (var item in items)
-            {
-                dict.Add(item.Key, item.Value);
-            }
+                        .Replace("{{DefaultCssUrl}}", config.DefaultCssRoute)
+                        .Replace("{{DefaultJsUrl}}", config.DefaultJavascriptRoute)
+                        .Replace("{{CssElement}}", string.Join(Environment.NewLine, css))
+                        .Replace("{{ScriptElement}}", string.Join(Environment.NewLine, js));
         }
 
         public static ReallySimpleDocumentationApplicationBuilder UseReallySimpleDocumentation(this IApplicationBuilder app, Action<SwaggerOptions> additionalSwaggerConfig = null)
@@ -52,7 +39,7 @@ namespace Marsman.ReallySimpleDocumentation
             var options = app.ApplicationServices.GetService<IOptions<SwaggerDocOptions>>()?.Value;
             if (options == null)
                 throw new InvalidOperationException(
-                    "SwaggerDocOptions not found - cannot use UseReallySimpleDocumentation without adding UseReallySimpleDocumentation - ensure you have called the For method in your chain after calling AddFacDocumentation");
+                    "SwaggerDocOptions not found - cannot use ReallySimpleDocumentation without adding ReallySimpleDocumentation. Ensure you have called the For method in your chain after calling AddReallySimpleDocumentation");
 
             app.UseSwagger(c =>
             {
@@ -63,8 +50,7 @@ namespace Marsman.ReallySimpleDocumentation
         }
 
         public static ReallySimpleDocumentationBuilder AddReallySimpleDocumentation(this IServiceCollection services,
-                                                                  Action<WikiMarkdownOptions> markdownOptions,
-                                                                  bool expandGenericSchemaIds = true)
+                                                                  Action<WikiMarkdownOptions> markdownOptions)
         {
             services.Configure(markdownOptions);
             services.AddSingleton<IWikiMarkdownHandler, WikiMarkdownHandler>();
@@ -76,17 +62,8 @@ namespace Marsman.ReallySimpleDocumentation
                 c.SchemaFilter<TypeDescriptionFilter>();
                 c.SchemaFilter<SwaggerIgnoreFilter>();
                 c.DocumentFilter<SwaggerDocFilter>();
-                if (expandGenericSchemaIds)
-                {
-                    c.CustomSchemaIds(x =>
-                    {
-                        if (x.IsConstructedGenericType)
-                        {
-                            return $"{x.Name.Substring(0, x.Name.LastIndexOf('`'))}<{string.Join(",", x.GetGenericArguments().Select(y => y.Name))}>";
-                        }
-                        return x.Name;
-                    });
-                }
+                c.SchemaFilter<SwaggerRequiredFilter>();
+                c.ParameterFilter<GuidParameterFilter>();
 
                 c.SchemaRegistryOptions.DescribeAllEnumsAsStrings = false;
                 c.SchemaRegistryOptions.UseReferencedDefinitionsForEnums = true;
