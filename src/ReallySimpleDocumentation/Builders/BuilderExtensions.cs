@@ -15,21 +15,23 @@ namespace Marsman.ReallySimpleDocumentation
         internal static string ReplaceApiTemplateVariables(this string input, IUIOptions config, SwaggerDocOptions options)
         {
             var css = new List<string>(config.AdditionalStylesheets.Where(x => !string.IsNullOrWhiteSpace(x)));
-            var js = new List<string>(config.AdditionalJavascript.Where(x => !string.IsNullOrWhiteSpace(x)));
             if (config.ServeDefaultCss) css.Add(config.DefaultCssRoute);
-            if (config.ServeDefaultJavascript) js.Add(config.DefaultJavascriptRoute);
             css = css.Select(x => $"<link rel='stylesheet' href='{x}'>").ToList();
-            js = css.Select(x => $"<script src='{x}'></script>").ToList();
+
+            var js = new List<string>(config.AdditionalJavascript.Where(x => !string.IsNullOrWhiteSpace(x)));
+            if (config.ServeDefaultJavascript) js.Add(config.DefaultJavascriptRoute);
+            js = js.Select(x => $"<script src='{x}'></script>").ToList();
+
+            var favIconElement = string.IsNullOrWhiteSpace(config.FaviconUrl) ? string.Empty : $"<link rel='icon' href='{config.FaviconUrl}'>";
 
             return input.Replace("{{ApiShortName}}", options.ShortName)
                         .Replace("{{ApiTitle}}", options.Title)
                         .Replace("{{ApiDescription}}", options.DefaultDescription)
-                        .Replace("{{FavIconUrl}}", config.FaviconUrl)
+                        .Replace("{{FavIconUrl}}", config.FaviconUrl ?? string.Empty)
+                        .Replace("{{FavIconElement}}", favIconElement)
                         .Replace("{{LogoUrl}}", config.LogoUrl)
                         .Replace("{{LogoAltText}}", config.LogoAltText)
                         .Replace("{{LogoBackgroundColor}}", config.LogoBackgroundColor)
-                        .Replace("{{DefaultCssUrl}}", config.DefaultCssRoute)
-                        .Replace("{{DefaultJsUrl}}", config.DefaultJavascriptRoute)
                         .Replace("{{CssElement}}", string.Join(Environment.NewLine, css))
                         .Replace("{{ScriptElement}}", string.Join(Environment.NewLine, js));
         }

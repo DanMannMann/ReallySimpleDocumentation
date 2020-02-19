@@ -169,7 +169,7 @@ namespace Marsman.ReallySimpleDocumentation
                 c.DocumentTitle = options.Title;
 
                 var authOptions = app.ApplicationServices.GetService<IOptions<AuthOptions>>()?.Value;
-                if (authOptions != null)
+                if (authOptions?.Enabled == true)
                 {
                     c.OAuthClientId(authOptions.ClientId);
                     c.OAuthAppName(authOptions.ClientName);

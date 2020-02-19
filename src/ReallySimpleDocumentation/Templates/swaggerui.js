@@ -2,23 +2,11 @@
     const targetNode = document;
     const config = { attributes: true, childList: true, subtree: true };
 
-    // Ensure favicon has stuck
-    var icons = Array.prototype.slice.call(document.querySelectorAll("link[rel*='icon']"));
-    for (var i of icons) {
-        if (i.href !== "{{FavIconUrl}}") {
-            i.href = "{{FavIconUrl}}";
-        }
-    }
+    checkFavIcon();
 
     // Callback function to execute when mutations are observed
     const callback = function (mutationsList, observer) {
-        // Ensure favicon has stuck
-        var icons = Array.prototype.slice.call(document.querySelectorAll("link[rel*='icon']"));
-        for (var i of icons) {
-            if (i.href !== "{{FavIconUrl}}") {
-                i.href = "{{FavIconUrl}}";
-            }
-        }
+        checkFavIcon();
 
         var link = document.querySelector("a.link[href='/swaggerui/{{ApiShortName}}/swagger.json']");
         if (link) {
@@ -71,3 +59,15 @@
     observer.observe(targetNode, config);
 
 });
+
+function checkFavIcon() {
+    if ('{{FavIconUrl}}' !== '') {
+        // Ensure favicon has stuck
+        var icons = Array.prototype.slice.call(document.querySelectorAll("link[rel*='icon']"));
+        for (var i of icons) {
+            if (i.href !== "{{FavIconUrl}}") {
+                i.href = "{{FavIconUrl}}";
+            }
+        }
+    }
+}

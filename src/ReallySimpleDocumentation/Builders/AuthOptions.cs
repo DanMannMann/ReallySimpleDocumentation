@@ -12,5 +12,6 @@ namespace Marsman.ReallySimpleDocumentation
         public IDictionary<string, string> Scopes { get; set; }
         public string ClientId { get; set; }
         public string ClientName { get; set; }
+        internal bool Enabled { get; set; }
     }
 }

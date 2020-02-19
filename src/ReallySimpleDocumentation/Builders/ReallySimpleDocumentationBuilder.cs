@@ -124,6 +124,7 @@ namespace Marsman.ReallySimpleDocumentation
         {
             services.Configure<AuthOptions>(opts =>
             {
+                opts.Enabled = true;
                 opts.Authority = authAuthority;
                 opts.Scopes = scopes;
                 opts.ClientId = clientId;
