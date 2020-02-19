@@ -21,6 +21,7 @@ namespace Marsman.ReallySimpleDocumentation.Demo
         private const string apiTitle = "Marsman.ReallySimpleDocumentation Demo API";
         private const string apiShortName  = "demo";
         private const string apiDescription = "A dummy API to demonstrate a thing.";
+        private const string apiVersion = "1.0";
 
         public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
@@ -42,7 +43,7 @@ namespace Marsman.ReallySimpleDocumentation.Demo
             .WithXmlFile(Path.Combine(AppContext.BaseDirectory, "ReallySimpleDocumentation.Demo.xml"), true)
             .WithRedoc()
             .WithSwaggerUI()
-            .For(apiTitle, apiShortName, apiDescription);
+            .For(apiShortName, apiTitle, apiDescription, apiVersion);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

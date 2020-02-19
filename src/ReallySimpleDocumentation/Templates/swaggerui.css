@@ -4,6 +4,10 @@
 	align-items: flex-start;
 }
 
+.hide-nav {
+    display: none;
+}
+
 .wiki-nav-bar {
 	width: 10%;
 	min-width: 150px;
@@ -25,8 +29,15 @@
     transition: ease .5s;
 }
 
-.wiki-nav-bar-item-wrapper {
+.nav-level-0 {
+    padding-left: 0px;
+}
+
+.nav-level-1 {
     padding-left: 10px;
+}
+
+.wiki-nav-bar-item-wrapper {
     border: 1px solid #a9cff5;
     border-right: 0px;
 }

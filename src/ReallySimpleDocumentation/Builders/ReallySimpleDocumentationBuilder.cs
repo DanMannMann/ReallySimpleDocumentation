@@ -69,21 +69,44 @@ namespace Marsman.ReallySimpleDocumentation
         /// <summary>
         /// The details of the API this builder is for. This method must be called last, and must be called.
         /// </summary>
-        public void For(string apiTitle, string apiShortName, string apiDescription, Action<Info> additionalInfoProvider = null)
+        public void For(string apiShortName, string apiTitle, string apiDescription, string apiVersion, Action<Info> additionalInfoProvider = null)
         {
             services.Configure<SwaggerDocOptions>(opts =>
             {
                 opts.Title = apiTitle;
                 opts.ShortName = apiShortName;
                 opts.DefaultDescription = apiDescription;
+                opts.Version = apiVersion;
             });
 
             var info = new Info
             {
                 Title = apiTitle,
-                Description = apiDescription
+                Description = apiDescription,
+                Version = apiVersion
             };
             additionalInfoProvider?.Invoke(info);
+            services.Configure<SwaggerGenOptions>(c =>
+            {
+                c.SwaggerDoc(apiShortName, info);
+            });
+        }
+
+        /// <summary>
+        /// The details of the API this builder is for. This method must be called last, and must be called.
+        /// </summary>
+        public void For(string apiShortName, Action<Info> additionalInfoProvider)
+        {
+            var info = new Info();
+            additionalInfoProvider?.Invoke(info);
+            services.Configure<SwaggerDocOptions>(opts =>
+            {
+                opts.ShortName = apiShortName;
+                opts.Title = info.Title;
+                opts.DefaultDescription = info.Description;
+                opts.Version = info.Version;
+            });
+
             services.Configure<SwaggerGenOptions>(c =>
             {
                 c.SwaggerDoc(apiShortName, info);

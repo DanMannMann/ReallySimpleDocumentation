@@ -24,6 +24,8 @@ namespace Marsman.ReallySimpleDocumentation
             if (!pathString.Value.Contains("/swaggerui/") &&
                 !pathString.Value.Contains("/redoc/"))
             {
+                swaggerDoc.Info.Title = options.Title;
+                swaggerDoc.Info.Version = options.Version;
                 swaggerDoc.Info.Description = options.DefaultDescription;
             }
         }

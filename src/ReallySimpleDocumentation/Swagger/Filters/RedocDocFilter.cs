@@ -36,6 +36,7 @@ namespace Marsman.ReallySimpleDocumentation
             if (pathString.Value.Contains("/redoc/"))
             {
                 swaggerDoc.Info.Title = docOptions.Title;
+                swaggerDoc.Info.Version = docOptions.Version;
                 swaggerDoc.Tags = swaggerDoc.Tags ?? new List<Tag>();
                 var existingTags = new List<Tag>(swaggerDoc.Tags);
                 swaggerDoc.Info.Description = null;
