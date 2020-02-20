@@ -31,11 +31,16 @@ namespace Marsman.ReallySimpleDocumentation
             {
                 if (!Directory.Exists(this.options.MarkdownFilesPath))
                 {
+
                     var r = new WikiMarkdown();
-                    r.Files.Add(("Error", $"<div style='color: red; font-size: large;'>Markdown files path {this.options.MarkdownFilesPath} not found</div>"));
+                    if (options.IncludeErrorDetailsInMarkdownOutput)
+                    {
+                        r.Files.Add(("Error", $"<div style='color: red; font-size: large;'>Markdown files path {this.options.MarkdownFilesPath} not found</div>"));
+                        return r;
+                    }
+                    r.Files.Add(("Error", $"<div style='color: red; font-size: large;'>Markdown files path not found</div>"));
                     return r;
                 }
-
                 var result = new WikiMarkdown();
                 GetOrderedFilePaths(out var files, out var rootOrder, out var orderedFolders);
                 ProcessMarkdownFolders(result, orderedFolders);

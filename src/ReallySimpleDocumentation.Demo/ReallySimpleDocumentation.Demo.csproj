@@ -17,9 +17,10 @@
   <ItemGroup>
     <None Remove="Docs\.order" />
     <None Remove="Docs\Hello-World\Hello-World.md" />
-    <None Remove="Docs\Hello-World\Introduction.md" />
+    <None Remove="Docs\Hello-World\More-Stuff.md" />
+    <None Remove="Docs\Hello-World\Stuff.md" />
     <None Remove="Docs\Introduction.md" />
-    <None Remove="Docs\Ola-Amigos\Introduction.md" />
+    <None Remove="Docs\Ola-Amigos\Thing.md" />
     <None Remove="Docs\Outroduction.md" />
   </ItemGroup>
 
@@ -27,10 +28,13 @@
     <Content Include="Docs\.order">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Docs\Hello-World\More-Stuff.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Docs\Hello-World\Hello-World.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Docs\Hello-World\Introduction.md">
+    <Content Include="Docs\Hello-World\Stuff.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Docs\Outroduction.md">
@@ -39,7 +43,7 @@
     <Content Include="Docs\Introduction.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Docs\Ola-Amigos\Introduction.md">
+    <Content Include="Docs\Ola-Amigos\Thing.md">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

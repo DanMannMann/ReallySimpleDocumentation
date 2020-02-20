@@ -21,10 +21,20 @@ namespace Marsman.ReallySimpleDocumentation
 
         public ReallySimpleDocumentationBuilder WithRedoc(Action<RedocUiOptions> redocOptions = null)
         {
-            if (redocOptions != null) services.Configure(redocOptions);
+            var opts = new RedocUiOptions();
+            redocOptions?.Invoke(opts);
+            services.AddSingleton(Options.Create(opts));
             services.Configure<SwaggerGenOptions>(c =>
             {
-                c.DocumentFilter<RedocDocFilter>();
+                switch (opts.WikiNavigationMode)
+                {
+                    case RedocNavigationMode.FoldersAsTagGroupsFilesAsTags:
+                        c.DocumentFilter<RedocFoldersAsTagGroupsFilesAsTagsDocFilter>();
+                        break;
+                    case RedocNavigationMode.FoldersAsTagsFilesAsHeadings:
+                        c.DocumentFilter<RedocFoldersAsTagsFilesAsHeadingsDocFilter>();
+                        break;
+                }
             });
             return this;
         }

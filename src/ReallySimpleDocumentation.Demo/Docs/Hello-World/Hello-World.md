@@ -3,7 +3,3 @@
 Yo.
 
 > word
-# HELLO WORLD
-
-<p style="font-size:1000%">YASSS</p>
-`Up.`

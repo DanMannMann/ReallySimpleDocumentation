@@ -2,6 +2,7 @@
 
 namespace Marsman.ReallySimpleDocumentation
 {
+
     public class RedocUiOptions : IUIOptions
     {
         private const string DefaultCss = "redoc-reallysimpledocs.css";
@@ -20,5 +21,8 @@ namespace Marsman.ReallySimpleDocumentation
         public bool ServeDefaultHtml { get; set; } = true;
         public List<string> AdditionalStylesheets { get; } = new List<string>();
         public List<string> AdditionalJavascript { get; } = new List<string>();
+        public string WikiGroupName { get; set; } = "Wiki";
+        public RedocNavigationMode WikiNavigationMode { get; set; } = RedocNavigationMode.FoldersAsTagsFilesAsHeadings;
+        public string WikiRootFilesFolderName { get; set; } = "Misc";
     }
 }

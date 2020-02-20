@@ -37,6 +37,10 @@
     padding-left: 10px;
 }
 
+.nav-level-2 {
+    padding-left: 15px;
+}
+
 .wiki-nav-bar-item-wrapper {
     border: 1px solid #a9cff5;
     border-right: 0px;

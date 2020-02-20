@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
@@ -15,14 +14,14 @@ using System.Web.Http;
 namespace Marsman.ReallySimpleDocumentation
 {
 
-    public class RedocDocFilter : IDocumentFilter
+    public class RedocFoldersAsTagGroupsFilesAsTagsDocFilter : IDocumentFilter
     {
         private readonly IHttpContextAccessor hcx;
         private readonly IWikiMarkdownHandler markdownHandler;
         private readonly RedocUiOptions options;
         private readonly SwaggerDocOptions docOptions;
 
-        public RedocDocFilter(IHttpContextAccessor hcx, IWikiMarkdownHandler markdownHandler, IOptions<RedocUiOptions> options, IOptions<SwaggerDocOptions> docOptions)
+        public RedocFoldersAsTagGroupsFilesAsTagsDocFilter(IHttpContextAccessor hcx, IWikiMarkdownHandler markdownHandler, IOptions<RedocUiOptions> options, IOptions<SwaggerDocOptions> docOptions)
         {
             this.hcx = hcx ?? throw new System.ArgumentNullException(nameof(hcx));
             this.markdownHandler = markdownHandler ?? throw new System.ArgumentNullException(nameof(markdownHandler));
@@ -63,7 +62,7 @@ namespace Marsman.ReallySimpleDocumentation
 
                 if (markdown.Files.Any())
                 {
-                    var miscTagGroup = new TagGroup { Name = "Misc", Tags = new List<string>() };
+                    var miscTagGroup = new TagGroup { Name = options.WikiRootFilesFolderName, Tags = new List<string>() };
                     tagGroups.Add(miscTagGroup);
                     foreach (var file in markdown.Files)
                     {
