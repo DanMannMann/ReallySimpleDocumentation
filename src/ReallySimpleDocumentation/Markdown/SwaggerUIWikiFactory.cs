@@ -36,18 +36,11 @@ namespace Marsman.ReallySimpleDocumentation
             var swaggerContent = new StringBuilder();
             var markdown = markdownHandler.GetMarkdownDocuments();
             var template = options.MainTemplate;
-
-            if (markdown.Folders.Count + markdown.Files.Count <= 1)
-            {
-                template = template.Replace("{{wiki_nav_class}}", " hide-nav");
-            }
-            else
-            {
-                template = template.Replace("{{wiki_nav_class}}", string.Empty);
-            }
+            var navCount = 0;
 
             foreach (var folder in markdown.Folders)
             {
+                navCount++;
                 swaggerNav.AppendLine(options.NavBarHeadingTemplate.Replace("{{name}}", folder.Name).Replace("{{nav-bar-item-wrapper-class}}", " nav-level-0"));
                 swaggerContent.AppendLine($"<span id='wiki-section-{folder.Name}'></span>");
 
@@ -61,6 +54,7 @@ namespace Marsman.ReallySimpleDocumentation
                 foreach (var file in folder.Files.Where(x => x.Name != folder.Name))
                 {
                     var html = Markdown.ToHtml(file.Content);
+                    navCount++;
                     swaggerNav.AppendLine(options.NavBarItemTemplate
                                                  .Replace("{{name}}", file.Name)
                                                  .Replace("{{ref-type}}", "tag")
@@ -77,6 +71,7 @@ namespace Marsman.ReallySimpleDocumentation
                 foreach (var file in markdown.Files)
                 {
                     var html = Markdown.ToHtml(file.Content);
+                    navCount++;
                     swaggerNav.AppendLine(options.NavBarItemTemplate
                                                  .Replace("{{name}}", file.Name)
                                                  .Replace("{{ref-type}}", "tag")
@@ -84,6 +79,15 @@ namespace Marsman.ReallySimpleDocumentation
                     html = InsertHeadingTagIds(swaggerNav, file, html, 1);
                     swaggerContent.AppendLine(options.ContentTemplate.Replace("{{name}}", file.Name).Replace("{{content}}", html));
                 }
+            }
+
+            if (navCount  > 1)
+            {
+                template = template.Replace("{{wiki_nav_class}}", string.Empty);
+            }
+            else
+            {
+                template = template.Replace("{{wiki_nav_class}}", " hide-nav");
             }
 
             return template.Replace("{{wiki_nav}}", swaggerNav.ToString()).Replace("{{wiki_content}}", swaggerContent.ToString());
