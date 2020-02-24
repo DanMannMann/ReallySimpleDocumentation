@@ -38,46 +38,44 @@ namespace Marsman.ReallySimpleDocumentation
             var template = options.MainTemplate;
             var navCount = 0;
 
-            foreach (var folder in markdown.Folders)
+            var mpb = new MarkdownPipelineBuilder();
+            mpb.UseEmojiAndSmiley();
+            var mp = mpb.Build();
+
+            foreach (var node in markdown)
             {
                 navCount++;
-                swaggerNav.AppendLine(options.NavBarHeadingTemplate.Replace("{{name}}", folder.Name).Replace("{{nav-bar-item-wrapper-class}}", " nav-level-0"));
-                swaggerContent.AppendLine($"<span id='wiki-section-{folder.Name}'></span>");
+                swaggerNav.AppendLine(options.NavBarHeadingTemplate.Replace("{{name}}", node.Name).Replace("{{nav-bar-item-wrapper-class}}", " nav-level-0"));
+                swaggerContent.AppendLine($"<span id='wiki-section-{node.Name}'></span>");
 
-                foreach (var file in folder.Files.Where(x => x.Name == folder.Name))
+                if (node is WikiMarkdownFolder folder)
                 {
-                    // No nav item for the same-name file, and always put the file at the top of the folder section.
-                    var html = Markdown.ToHtml(file.Content);
-                    html = InsertHeadingTagIds(swaggerNav, file, html, 2);
-                    swaggerContent.AppendLine(options.ContentTemplate.Replace("{{name}}", file.Name).Replace("{{content}}", html));
+                    foreach (var file in folder.Where(x => x.Name == folder.Name))
+                    {
+                        // No nav item for the same-name file, and always put the file at the top of the folder section.
+                        var html = Markdown.ToHtml(file.Content, mp);
+                        html = InsertHeadingTagIds(swaggerNav, file, html, 2);
+                        swaggerContent.AppendLine(options.ContentTemplate.Replace("{{name}}", file.Name).Replace("{{content}}", html));
+                    }
+                    foreach (var file in folder.Where(x => x.Name != folder.Name))
+                    {
+                        var html = Markdown.ToHtml(file.Content, mp);
+                        navCount++;
+                        swaggerNav.AppendLine(options.NavBarItemTemplate
+                                                     .Replace("{{name}}", file.Name)
+                                                     .Replace("{{ref-type}}", "tag")
+                                                     .Replace("{{nav-bar-item-wrapper-class}}", " nav-level-1"));
+
+                        html = InsertHeadingTagIds(swaggerNav, file, html, 2);
+                        swaggerContent.AppendLine(options.ContentTemplate.Replace("{{name}}", file.Name).Replace("{{content}}", html));
+                    }
                 }
-                foreach (var file in folder.Files.Where(x => x.Name != folder.Name))
+                
+                if (node is WikiMarkdownFile rootFile)
                 {
-                    var html = Markdown.ToHtml(file.Content);
-                    navCount++;
-                    swaggerNav.AppendLine(options.NavBarItemTemplate
-                                                 .Replace("{{name}}", file.Name)
-                                                 .Replace("{{ref-type}}", "tag")
-                                                 .Replace("{{nav-bar-item-wrapper-class}}", " nav-level-1"));
-
-                    html = InsertHeadingTagIds(swaggerNav, file, html, 2);
-                    swaggerContent.AppendLine(options.ContentTemplate.Replace("{{name}}", file.Name).Replace("{{content}}", html));
-                }
-            }
-
-            if (markdown.Files.Any())
-            {
-                swaggerContent.AppendLine($"<span id='wiki-section-Misc'></span>");
-                foreach (var file in markdown.Files)
-                {
-                    var html = Markdown.ToHtml(file.Content);
-                    navCount++;
-                    swaggerNav.AppendLine(options.NavBarItemTemplate
-                                                 .Replace("{{name}}", file.Name)
-                                                 .Replace("{{ref-type}}", "tag")
-                                                 .Replace("{{nav-bar-item-wrapper-class}}", " nav-level-0"));
-                    html = InsertHeadingTagIds(swaggerNav, file, html, 1);
-                    swaggerContent.AppendLine(options.ContentTemplate.Replace("{{name}}", file.Name).Replace("{{content}}", html));
+                    var html = Markdown.ToHtml(rootFile.Content, mp);
+                    html = InsertHeadingTagIds(swaggerNav, rootFile, html, 1);
+                    swaggerContent.AppendLine(options.ContentTemplate.Replace("{{name}}", rootFile.Name).Replace("{{content}}", html));
                 }
             }
 
@@ -93,7 +91,7 @@ namespace Marsman.ReallySimpleDocumentation
             return template.Replace("{{wiki_nav}}", swaggerNav.ToString()).Replace("{{wiki_content}}", swaggerContent.ToString());
         }
 
-        private string InsertHeadingTagIds(StringBuilder swaggerNav, (string Name, string Content) file, string html, int navLevel)
+        private string InsertHeadingTagIds(StringBuilder swaggerNav, WikiMarkdownFile file, string html, int navLevel)
         {
             var headings = Markdown.Parse(file.Content)
                                                        .Where(x => x is HeadingBlock)

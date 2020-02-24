@@ -35,16 +35,29 @@ namespace Marsman.ReallySimpleDocumentation
                     var r = new WikiMarkdown();
                     if (options.IncludeErrorDetailsInMarkdownOutput)
                     {
-                        r.Files.Add(("Error", $"<div style='color: red; font-size: large;'>Markdown files path {this.options.MarkdownFilesPath} not found</div>"));
+                        r.Add(new WikiMarkdownFile("Error", $"<div style='color: red; font-size: large;'>Markdown files path {this.options.MarkdownFilesPath} not found</div>"));
                         return r;
                     }
-                    r.Files.Add(("Error", $"<div style='color: red; font-size: large;'>Markdown files path not found</div>"));
+                    r.Add(new WikiMarkdownFile("Error", $"<div style='color: red; font-size: large;'>Markdown files path not found</div>"));
                     return r;
                 }
                 var result = new WikiMarkdown();
-                GetOrderedFilePaths(out var files, out var rootOrder, out var orderedFolders);
-                ProcessMarkdownFolders(result, orderedFolders);
+                var files = Directory.EnumerateFiles(this.options.MarkdownFilesPath).Where(x => x.ToLowerInvariant().EndsWith(".md")).OrderBy(x => x).ToList();
+                var folders = Directory.EnumerateDirectories(this.options.MarkdownFilesPath).OrderBy(x => x).ToList();
+                string[] rootOrder;
+
+                if (File.Exists(@$"{this.options.MarkdownFilesPath}\.order"))
+                {
+                    rootOrder = File.ReadAllText(@$"{this.options.MarkdownFilesPath}\.order").Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                }
+                else
+                {
+                    rootOrder = new string[0];
+                }
+
+                ProcessMarkdownFolders(result, folders, rootOrder);
                 ProcessMarkdownFiles(result, files, rootOrder);
+                result.Sort();
                 return result;
             }
             catch (Exception ex)
@@ -61,54 +74,44 @@ namespace Marsman.ReallySimpleDocumentation
                 
                 if (options.IncludeErrorDetailsInMarkdownOutput)
                 {
-                    r.Files.Add(("Error", $"<div style='color: red; font-size: large;'>Unexpected error during markdown rendering: {ex.ToString()}.</div>"));
+                    r.Add(new WikiMarkdownFile("Error", $"<div style='color: red; font-size: large;'>Unexpected error during markdown rendering: {ex.ToString()}.</div>"));
                     return r;
                 }
 
-                r.Files.Add(("Error", $"<div style='color: red; font-size: large;'>Unexpected error during markdown rendering: {msg}. Set the option IncludeErrorDetailsInMarkdownOutput to include full error details in these messages.</div>"));
+                r.Add(new WikiMarkdownFile("Error", $"<div style='color: red; font-size: large;'>Unexpected error during markdown rendering: {msg}. Set the option IncludeErrorDetailsInMarkdownOutput to include full error details in these messages.</div>"));
+                r.Sort();
                 return r;
             }
         }
 
-        private void ProcessMarkdownFolders(WikiMarkdown result, IList<string> orderedFolders)
+        private void ProcessMarkdownFolders(WikiMarkdown result, IList<string> folders, IList<string> rootOrder)
         {
-            foreach (var folder in orderedFolders)
+            foreach (var folder in folders)
             {
                 var markdownFolder = new WikiMarkdownFolder(Path.GetFileNameWithoutExtension(folder).Replace("-", " "));
-                result.Folders.Add(markdownFolder);
+                markdownFolder.Order = rootOrder.Contains(markdownFolder.Name) ? rootOrder.IndexOf(markdownFolder.Name) : int.MaxValue;
+                result.Add(markdownFolder);
+
                 var subFiles = Directory.EnumerateFiles(folder).Where(x => x.ToLowerInvariant().EndsWith(".md")).OrderBy(x => x).ToList();
-                string[] subFileOrder;
+                IList<string> subFileOrder;
                 string orderPath = Path.Combine(folder, ".order");
                 if (File.Exists(orderPath))
                 {
-                    subFileOrder = File.ReadAllText(orderPath).Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    subFileOrder = File.ReadAllText(orderPath).Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries).ToList();
                 }
                 else
                 {
-                    subFileOrder = new string[0];
+                    subFileOrder = new List<string>();
                 }
 
-                var orderedSubFiles = new List<string>();
-                foreach (var orderName in subFileOrder)
-                {
-                    var match = subFiles.FirstOrDefault(x => string.Equals(Path.GetFileNameWithoutExtension(x), orderName, StringComparison.OrdinalIgnoreCase));
-                    if (match != null)
-                    {
-                        orderedSubFiles.Add(match);
-                    }
-                }
-                foreach (var subFile in subFiles)
-                {
-                    if (!orderedSubFiles.Contains(subFile))
-                    {
-                        orderedSubFiles.Add(subFile);
-                    }
-                }
-                foreach (var file in orderedSubFiles)
+                foreach (var file in subFiles)
                 {
                     var name = Path.GetFileNameWithoutExtension(file).Replace("-", " ");
-                    markdownFolder.Files.Add((name, ReplaceTemplateVariables(File.ReadAllText(file))));
+                    var markdownFile = new WikiMarkdownFile(name, ReplaceTemplateVariables(File.ReadAllText(file)));
+                    markdownFile.Order = subFileOrder.Contains(markdownFile.Name) ? subFileOrder.IndexOf(markdownFile.Name) : int.MaxValue;
+                    markdownFolder.Add(markdownFile);
                 }
+                markdownFolder.Sort();
             }
         }
 
@@ -116,58 +119,12 @@ namespace Marsman.ReallySimpleDocumentation
         {
             if (files.Any())
             {
-                var orderedFiles = new List<string>();
-                foreach (var orderName in rootOrder)
-                {
-                    var match = files.FirstOrDefault(x => string.Equals(Path.GetFileNameWithoutExtension(x), orderName, StringComparison.OrdinalIgnoreCase));
-                    if (match != null)
-                    {
-                        orderedFiles.Add(match);
-                    }
-                }
                 foreach (var file in files)
                 {
-                    if (!orderedFiles.Contains(file))
-                    {
-                        orderedFiles.Add(file);
-                    }
-                }
-
-                foreach (var file in orderedFiles)
-                {
                     var name = Path.GetFileNameWithoutExtension(file).Replace("-", " ");
-                    result.Files.Add((name, ReplaceTemplateVariables(File.ReadAllText(file))));
-                }
-            }
-        }
-
-        private void GetOrderedFilePaths(out IList<string> files, out IList<string> rootOrder, out IList<string> orderedFolders)
-        {
-            files = Directory.EnumerateFiles(this.options.MarkdownFilesPath).Where(x => x.ToLowerInvariant().EndsWith(".md")).OrderBy(x => x).ToList();
-            var folders = Directory.EnumerateDirectories(this.options.MarkdownFilesPath).OrderBy(x => x);
-            if (File.Exists(@$"{this.options.MarkdownFilesPath}\.order"))
-            {
-                rootOrder = File.ReadAllText(@$"{this.options.MarkdownFilesPath}\.order").Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
-            }
-            else
-            {
-                rootOrder = new string[0];
-            }
-
-            orderedFolders = new List<string>();
-            foreach (var orderName in rootOrder)
-            {
-                var match = folders.FirstOrDefault(x => string.Equals(Path.GetFileNameWithoutExtension(x), orderName, StringComparison.OrdinalIgnoreCase));
-                if (match != null)
-                {
-                    orderedFolders.Add(match);
-                }
-            }
-            foreach (var folder in folders)
-            {
-                if (!orderedFolders.Contains(folder))
-                {
-                    orderedFolders.Add(folder);
+                    var markdownFile = new WikiMarkdownFile(name, ReplaceTemplateVariables(File.ReadAllText(file)));
+                    markdownFile.Order = rootOrder.Contains(markdownFile.Name) ? rootOrder.IndexOf(markdownFile.Name) : int.MaxValue;
+                    result.Add(markdownFile);
                 }
             }
         }

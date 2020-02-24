@@ -1,0 +1,1 @@
+﻿When a file has the exact same name as the folder it is in, it doesn't get its own nav heading - the content is presented as the "top level" content of the folder.

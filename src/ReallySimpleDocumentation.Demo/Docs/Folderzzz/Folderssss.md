@@ -1,0 +1,1 @@
+﻿But files with a different name to the folder still show up in nav.

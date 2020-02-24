@@ -38,53 +38,48 @@ namespace Marsman.ReallySimpleDocumentation
                 var tagGroup = new TagGroup
                 {
                     Name = options.WikiGroupName,
-                    Tags = markdown.Folders.Select(x => x.Name).ToList()
+                    Tags = new List<string>()
                 };
-                foreach (var folder in markdown.Folders)
+                foreach (var node in markdown)
                 {
                     var content = new StringBuilder();
-                    foreach (var file in folder.Files.Where(x => x.Name == folder.Name))
+                    switch (node)
                     {
-                        content.AppendLine(file.Content);
-                        content.AppendLine();
-                        content.AppendLine();
+                        case WikiMarkdownFolder folder:
+                            tagGroup.Tags.Add(folder.Name);
+                            foreach (var file in folder.Where(x => x.Name == folder.Name))
+                            {
+                                content.AppendLine(file.Content);
+                                content.AppendLine();
+                                content.AppendLine();
+                            }
+
+                            foreach (var file in folder.Where(x => x.Name != folder.Name))
+                            {
+                                content.AppendLine($"# {file.Name}");
+                                content.AppendLine(file.Content);
+                                content.AppendLine();
+                                content.AppendLine();
+                            }
+                            swaggerDoc.Tags.Add(new Tag
+                            {
+                                Name = folder.Name,
+                                Description = content.ToString()
+                            });
+                            break;
+
+                        case WikiMarkdownFile rootFile:
+                            tagGroup.Tags.Add(rootFile.Name);
+                            content.AppendLine(rootFile.Content);
+                            content.AppendLine();
+                            content.AppendLine();
+                            swaggerDoc.Tags.Add(new Tag
+                            {
+                                Name = rootFile.Name,
+                                Description = content.ToString()
+                            });
+                            break;
                     }
-
-                    foreach (var file in folder.Files.Where(x => x.Name != folder.Name))
-                    {
-                        content.AppendLine($"# {file.Name}");
-                        content.AppendLine(file.Content);
-                        content.AppendLine();
-                        content.AppendLine();
-                    }
-
-                    var tag = new Tag
-                    {
-                        Name = folder.Name,
-                        Description = content.ToString()
-                    };
-                    swaggerDoc.Tags.Add(tag);
-                }
-
-                if (markdown.Files.Any())
-                {
-                    var content = new StringBuilder();
-                    tagGroup.Tags.Add(options.WikiRootFilesFolderName);
-
-                    foreach (var file in markdown.Files)
-                    {
-                        content.AppendLine($"# {file.Name}");
-                        content.AppendLine(file.Content);
-                        content.AppendLine();
-                        content.AppendLine();
-                    }
-
-                    var tag = new Tag
-                    {
-                        Name = options.WikiRootFilesFolderName,
-                        Description = content.ToString()
-                    };
-                    swaggerDoc.Tags.Add(tag);
                 }
 
                 swaggerDoc.Extensions.Add("x-tagGroups", new List<TagGroup>

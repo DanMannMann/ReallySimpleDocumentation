@@ -41,15 +41,15 @@ namespace Marsman.ReallySimpleDocumentation
                 swaggerDoc.Info.Description = null;
                 var markdown = markdownHandler.GetMarkdownDocuments();
                 var tagGroups = new List<TagGroup>();
-                foreach (var folder in markdown.Folders)
+                foreach (var folder in markdown.OfType<WikiMarkdownFolder>())
                 {
                     tagGroups.Add(new TagGroup
                     {
                         Name = folder.Name,
-                        Tags = folder.Files.Select(x => x.Name).ToList()
+                        Tags = folder.Select(x => x.Name).ToList()
                     });
 
-                    foreach (var file in folder.Files)
+                    foreach (var file in folder)
                     {
                         var tag = new Tag
                         {
@@ -60,11 +60,11 @@ namespace Marsman.ReallySimpleDocumentation
                     }
                 }
 
-                if (markdown.Files.Any())
+                if (markdown.OfType<WikiMarkdownFile>().Any())
                 {
                     var miscTagGroup = new TagGroup { Name = options.WikiRootFilesFolderName, Tags = new List<string>() };
                     tagGroups.Add(miscTagGroup);
-                    foreach (var file in markdown.Files)
+                    foreach (var file in markdown.OfType<WikiMarkdownFile>())
                     {
                         var tag = new Tag
                         {

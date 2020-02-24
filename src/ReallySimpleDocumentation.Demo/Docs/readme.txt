@@ -1,1 +1,0 @@
-﻿This folder is connected to a wiki in Azure DevOps, so the contents can be edited using the DevOps wiki edit tools.
