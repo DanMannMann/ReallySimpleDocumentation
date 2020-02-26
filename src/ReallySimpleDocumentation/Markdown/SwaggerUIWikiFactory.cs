@@ -97,19 +97,19 @@ namespace Marsman.ReallySimpleDocumentation
                                                        .Where(x => x is HeadingBlock)
                                                        .Cast<HeadingBlock>()
                                                        .ToList();
-            foreach (var heading in headings)
+            foreach (var heading in headings.Where(x => x.Level == 1 || x.Level == 2))
             {
                 var text = heading.Inline.FirstChild.ToString();
                 var section = $"section/{text}";
                 html = Regex.Replace(html,
-                                     @$"<(h\d)>{Regex.Escape(text)}</\1>",
+                                     @$"<(h[1-2])>{Regex.Escape(text)}</\1>",
                                      $@"<$1 id='{section}'>{text}</$1>",
                                      RegexOptions.IgnoreCase);
 
                 swaggerNav.AppendLine(options.NavBarItemTemplate
                                              .Replace("{{name}}", text)
                                              .Replace("{{ref-type}}", "section")
-                                             .Replace("{{nav-bar-item-wrapper-class}}", $" nav-level-{navLevel}"));
+                                             .Replace("{{nav-bar-item-wrapper-class}}", $" nav-level-{navLevel + heading.Level - 1}"));
             }
 
             return html;
