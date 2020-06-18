@@ -4,8 +4,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <LangVersion>latest</LangVersion>
     <RootNamespace>Marsman.ReallySimpleDocumentation</RootNamespace>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Marsman.ReallySimpleDocumentation</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Authors>Marsman</Authors>
     <Company>Marsman</Company>
     <Product>Marsman.ReallySimpleDocumentation</Product>
@@ -49,6 +49,7 @@
   <ItemGroup>
     <PackageReference Include="Flurl" Version="2.8.2" />
     <PackageReference Include="Markdig" Version="0.18.1" />
+    <PackageReference Include="Marsman.ReallySimpleDocumentation.Attributes" Version="1.0.0" />
     <PackageReference Include="Marsman.Reflekt" Version="0.8.0" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Core" Version="5.2.7" />
