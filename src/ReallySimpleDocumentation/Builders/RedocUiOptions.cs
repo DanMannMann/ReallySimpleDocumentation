@@ -24,5 +24,6 @@ namespace Marsman.ReallySimpleDocumentation
         public string WikiGroupName { get; set; } = "Wiki";
         public RedocNavigationMode WikiNavigationMode { get; set; } = RedocNavigationMode.FoldersAsTagsFilesAsHeadings;
         public string WikiRootFilesFolderName { get; set; } = "Misc";
+        public string RedocBundleUrl { get; set; } = "https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js";
     }
 }

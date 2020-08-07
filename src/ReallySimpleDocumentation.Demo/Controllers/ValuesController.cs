@@ -1,11 +1,17 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Marsman.ReallySimpleDocumentation.Demo.Controllers
 {
+    public enum IntEnum
+    {
+        One,
+        Two,
+        Three,
+        Four
+    }
+
     /// <summary>
     /// Gets values and that
     /// </summary>
@@ -29,7 +35,7 @@ namespace Marsman.ReallySimpleDocumentation.Demo.Controllers
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpGet("{id}")]
-        public ActionResult<string> Get(int id)
+        public ActionResult<string> Get(IntEnum id)
         {
             return "value";
         }
@@ -47,9 +53,9 @@ namespace Marsman.ReallySimpleDocumentation.Demo.Controllers
         /// // PUT api/values/5
         /// </summary>
         /// <param name="id">id</param>
-        /// <param name="value">valeuwe</param>
+        /// <param name="value">value</param>
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(Guid id, [FromBody] string value)
         {
         }
 

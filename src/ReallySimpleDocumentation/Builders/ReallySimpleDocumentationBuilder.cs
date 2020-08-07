@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
@@ -79,7 +80,7 @@ namespace Marsman.ReallySimpleDocumentation
         /// <summary>
         /// The details of the API this builder is for. This method must be called last, and must be called.
         /// </summary>
-        public void For(string apiShortName, string apiTitle, string apiDescription, string apiVersion, Action<Info> additionalInfoProvider = null)
+        public void For(string apiShortName, string apiTitle, string apiDescription, string apiVersion, Action<OpenApiInfo> additionalInfoProvider = null)
         {
             services.Configure<SwaggerDocOptions>(opts =>
             {
@@ -89,7 +90,7 @@ namespace Marsman.ReallySimpleDocumentation
                 opts.Version = apiVersion;
             });
 
-            var info = new Info
+            var info = new OpenApiInfo
             {
                 Title = apiTitle,
                 Description = apiDescription,
@@ -105,9 +106,9 @@ namespace Marsman.ReallySimpleDocumentation
         /// <summary>
         /// The details of the API this builder is for. This method must be called last, and must be called.
         /// </summary>
-        public void For(string apiShortName, Action<Info> additionalInfoProvider)
+        public void For(string apiShortName, Action<OpenApiInfo> additionalInfoProvider)
         {
-            var info = new Info();
+            var info = new OpenApiInfo();
             additionalInfoProvider?.Invoke(info);
             services.Configure<SwaggerDocOptions>(opts =>
             {
@@ -172,11 +173,17 @@ namespace Marsman.ReallySimpleDocumentation
             });
             services.Configure<SwaggerGenOptions>(c =>
             {
-                c.AddSecurityDefinition("oauth2", new OAuth2Scheme
+                c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
                 {
-                    Flow = "implicit",
-                    AuthorizationUrl = authAuthority.EndsWith("/") ? $"{authAuthority}connect/authorize" : $"{authAuthority}/connect/authorize",
-                    Scopes = scopes
+                    Type = SecuritySchemeType.OAuth2,
+                    Flows = new OpenApiOAuthFlows
+                    {
+                        Implicit = new OpenApiOAuthFlow
+                        {
+                            AuthorizationUrl = new Uri(authAuthority.EndsWith("/") ? $"{authAuthority}connect/authorize" : $"{authAuthority}/connect/authorize"),
+                            Scopes = scopes
+                        }
+                    }
                 });
                 c.OperationFilter<OperationScopeAttachmentFilter>();
             });

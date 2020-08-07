@@ -1,15 +1,10 @@
 ﻿using Markdig;
 using Markdig.Syntax;
-using Markdig.Syntax.Inlines;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using System;
-using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Xml;
-using System.Xml.XPath;
 
 namespace Marsman.ReallySimpleDocumentation
 {

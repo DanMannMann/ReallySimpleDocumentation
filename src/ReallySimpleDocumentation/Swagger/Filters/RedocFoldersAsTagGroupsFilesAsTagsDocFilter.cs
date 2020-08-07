@@ -1,15 +1,10 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text.RegularExpressions;
-using System.Web.Http;
 
 namespace Marsman.ReallySimpleDocumentation
 {
@@ -29,15 +24,15 @@ namespace Marsman.ReallySimpleDocumentation
             this.docOptions = docOptions?.Value ?? throw new System.ArgumentNullException(nameof(docOptions));
         }
 
-        public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
             var pathString = hcx.HttpContext.Request.Path;
             if (pathString.Value.Contains("/redoc/"))
             {
                 swaggerDoc.Info.Title = docOptions.Title;
                 swaggerDoc.Info.Version = docOptions.Version;
-                swaggerDoc.Tags = swaggerDoc.Tags ?? new List<Tag>();
-                var existingTags = new List<Tag>(swaggerDoc.Tags);
+                swaggerDoc.Tags = swaggerDoc.Tags ?? new List<OpenApiTag>();
+                var existingTags = new List<string>(swaggerDoc.Tags.Select(x => x.Name));
                 swaggerDoc.Info.Description = null;
                 var markdown = markdownHandler.GetMarkdownDocuments();
                 var tagGroups = new List<TagGroup>();
@@ -46,12 +41,12 @@ namespace Marsman.ReallySimpleDocumentation
                     tagGroups.Add(new TagGroup
                     {
                         Name = folder.Name,
-                        Tags = folder.Select(x => x.Name).ToList()
+                        Tags = folder.Select(x => x.Name).ToOpenApiArray()
                     });
 
                     foreach (var file in folder)
                     {
-                        var tag = new Tag
+                        var tag = new OpenApiTag
                         {
                             Name = file.Name,
                             Description = file.Content
@@ -62,28 +57,30 @@ namespace Marsman.ReallySimpleDocumentation
 
                 if (markdown.OfType<WikiMarkdownFile>().Any())
                 {
-                    var miscTagGroup = new TagGroup { Name = options.WikiRootFilesFolderName, Tags = new List<string>() };
+                    var miscTagGroup = new TagGroup { Name = options.WikiRootFilesFolderName, Tags = new OpenApiArray() };
                     tagGroups.Add(miscTagGroup);
                     foreach (var file in markdown.OfType<WikiMarkdownFile>())
                     {
-                        var tag = new Tag
+                        var tag = new OpenApiTag
                         {
                             Name = file.Name,
                             Description = file.Content
                         };
-                        miscTagGroup.Tags.Add(file.Name);
+                        miscTagGroup.Tags.Add(new OpenApiString(file.Name));
                         swaggerDoc.Tags.Add(tag);
                     }
                 }
 
+                var additions = options.AdditionalControllersToInclude.Except(existingTags, System.StringComparer.OrdinalIgnoreCase).ToList();
+                existingTags.AddRange(additions);
                 tagGroups.Add(
                     new TagGroup 
                     { 
                         Name = options.ApiReferenceGroupName, 
-                        Tags = options.AdditionalControllersToInclude.Union(existingTags.Select(x => x.Name)).ToList()
+                        Tags = existingTags.ToOpenApiArray()
                     });
 
-                swaggerDoc.Extensions.Add("x-tagGroups", tagGroups);
+                swaggerDoc.Extensions.Add("x-tagGroups", tagGroups.ToOpenApiArray());
                 
                 if (!swaggerDoc.Info.Extensions.ContainsKey("x-logo") && !string.IsNullOrWhiteSpace(options.LogoUrl))
                 {

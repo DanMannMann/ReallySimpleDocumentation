@@ -1,10 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Swashbuckle.AspNetCore.Swagger;
-using Swashbuckle.AspNetCore.SwaggerGen;
+﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace Marsman.ReallySimpleDocumentation

@@ -1,8 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
-using System.Linq;
 
 namespace Marsman.ReallySimpleDocumentation
 {
@@ -15,7 +14,7 @@ namespace Marsman.ReallySimpleDocumentation
             this.hcx = hcx ?? throw new System.ArgumentNullException(nameof(hcx));
         }
 
-        public void Apply(Operation operation, OperationFilterContext context)
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             var pathString = hcx.HttpContext.Request.Path;
             if (pathString.Value.Contains("/swaggerui/"))

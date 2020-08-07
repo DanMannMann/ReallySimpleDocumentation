@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,21 +24,21 @@ namespace Marsman.ReallySimpleDocumentation
             this.docOptions = docOptions?.Value ?? throw new System.ArgumentNullException(nameof(docOptions));
         }
 
-        public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
             var pathString = hcx.HttpContext.Request.Path;
             if (pathString.Value.Contains("/redoc/"))
             {
                 swaggerDoc.Info.Title = docOptions.Title;
                 swaggerDoc.Info.Version = docOptions.Version;
-                swaggerDoc.Tags = swaggerDoc.Tags ?? new List<Tag>();
-                var existingTags = new List<Tag>(swaggerDoc.Tags);
+                swaggerDoc.Tags = swaggerDoc.Tags ?? new List<OpenApiTag>();
+                var existingTags = new List<string>(swaggerDoc.Tags.Select(x => x.Name));
                 swaggerDoc.Info.Description = null;
                 var markdown = markdownHandler.GetMarkdownDocuments();
                 var tagGroup = new TagGroup
                 {
                     Name = options.WikiGroupName,
-                    Tags = new List<string>()
+                    Tags = new OpenApiArray()
                 };
                 foreach (var node in markdown)
                 {
@@ -46,7 +46,7 @@ namespace Marsman.ReallySimpleDocumentation
                     switch (node)
                     {
                         case WikiMarkdownFolder folder:
-                            tagGroup.Tags.Add(folder.Name);
+                            tagGroup.Tags.Add(new OpenApiString(folder.Name));
                             foreach (var file in folder.Where(x => x.Name == folder.Name))
                             {
                                 content.AppendLine(file.Content);
@@ -61,7 +61,7 @@ namespace Marsman.ReallySimpleDocumentation
                                 content.AppendLine();
                                 content.AppendLine();
                             }
-                            swaggerDoc.Tags.Add(new Tag
+                            swaggerDoc.Tags.Add(new OpenApiTag
                             {
                                 Name = folder.Name,
                                 Description = content.ToString()
@@ -69,11 +69,11 @@ namespace Marsman.ReallySimpleDocumentation
                             break;
 
                         case WikiMarkdownFile rootFile:
-                            tagGroup.Tags.Add(rootFile.Name);
+                            tagGroup.Tags.Add(new OpenApiString(rootFile.Name));
                             content.AppendLine(rootFile.Content);
                             content.AppendLine();
                             content.AppendLine();
-                            swaggerDoc.Tags.Add(new Tag
+                            swaggerDoc.Tags.Add(new OpenApiTag
                             {
                                 Name = rootFile.Name,
                                 Description = content.ToString()
@@ -82,13 +82,16 @@ namespace Marsman.ReallySimpleDocumentation
                     }
                 }
 
-                swaggerDoc.Extensions.Add("x-tagGroups", new List<TagGroup>
+                var additions = options.AdditionalControllersToInclude.Except(existingTags, System.StringComparer.OrdinalIgnoreCase).ToList();
+                existingTags.AddRange(additions);
+
+                swaggerDoc.Extensions.Add("x-tagGroups", new OpenApiArray
                 {
                     tagGroup,
                     new TagGroup
                     {
                         Name = options.ApiReferenceGroupName,
-                        Tags = options.AdditionalControllersToInclude.Union(existingTags.Select(x => x.Name)).ToList()
+                        Tags = existingTags.ToOpenApiArray()
                     }
                 });
 

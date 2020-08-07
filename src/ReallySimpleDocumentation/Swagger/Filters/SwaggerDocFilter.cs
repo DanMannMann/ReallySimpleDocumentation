@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Swagger;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Marsman.ReallySimpleDocumentation
@@ -17,7 +17,7 @@ namespace Marsman.ReallySimpleDocumentation
             this.options = options?.Value ?? throw new System.ArgumentNullException(nameof(options));
         }
 
-        public void Apply(SwaggerDocument swaggerDoc, DocumentFilterContext context)
+        public void Apply(OpenApiDocument swaggerDoc, DocumentFilterContext context)
         {
             var pathString = hcx.HttpContext.Request.Path;
 

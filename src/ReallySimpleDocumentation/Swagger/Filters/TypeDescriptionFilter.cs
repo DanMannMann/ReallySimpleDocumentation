@@ -1,4 +1,5 @@
-﻿using Swashbuckle.AspNetCore.Swagger;
+﻿using Microsoft.OpenApi.Any;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,9 +15,9 @@ namespace Marsman.ReallySimpleDocumentation
             this.types = types;
         }
 
-        public void Apply(Schema schema, SchemaFilterContext context)
+        public void Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
-            var type = types.FirstOrDefault(x => x.Type == context.SystemType);
+            var type = types.FirstOrDefault(x => x.Type == context.Type);
             if (type != null)
             {
                 schema.Description = type.Description ?? schema.Description;
@@ -37,8 +38,7 @@ namespace Marsman.ReallySimpleDocumentation
 
                 if (schema.Enum != null)
                 {
-                    var enumIntersect = type.MembersToExclude.Intersect(schema.Enum).ToList();
-                    schema.Enum = schema.Enum.Except(enumIntersect).ToList();
+                    schema.Enum = schema.Enum.Where(x => !(x is OpenApiString s) || !type.MembersToExclude.Contains(s.Value, System.StringComparer.OrdinalIgnoreCase)).ToList();
                 }
             }
         }

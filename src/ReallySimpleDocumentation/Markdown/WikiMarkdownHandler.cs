@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.Swagger;
+﻿using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.IO;

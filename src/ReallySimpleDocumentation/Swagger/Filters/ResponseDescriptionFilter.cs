@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Annotations;
-using Swashbuckle.AspNetCore.Swagger;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Linq;
 
@@ -8,7 +8,7 @@ namespace Marsman.ReallySimpleDocumentation
 {
     public class ResponseDescriptionFilter : IOperationFilter
     {
-        public void Apply(Operation operation, OperationFilterContext context)
+        public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
             var descriptor = context.ApiDescription.ActionDescriptor;
             if (descriptor is ControllerActionDescriptor cad)

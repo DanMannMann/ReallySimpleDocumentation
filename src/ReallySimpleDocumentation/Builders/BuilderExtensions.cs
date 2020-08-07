@@ -1,12 +1,10 @@
-﻿using Flurl;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.Swagger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Marsman.ReallySimpleDocumentation
 {
@@ -23,6 +21,11 @@ namespace Marsman.ReallySimpleDocumentation
             js = js.Select(x => $"<script src='{x}'></script>").ToList();
 
             var favIconElement = string.IsNullOrWhiteSpace(config.FaviconUrl) ? string.Empty : $"<link rel='icon' href='{config.FaviconUrl}'>";
+
+            if (config is RedocUiOptions ruio)
+            {
+                input = input.Replace("{{RedocBundleUrl}}", ruio.RedocBundleUrl);
+            }
 
             return input.Replace("{{ApiShortName}}", options.ShortName)
                         .Replace("{{ApiTitle}}", options.Title)
@@ -67,8 +70,6 @@ namespace Marsman.ReallySimpleDocumentation
                 c.SchemaFilter<SwaggerRequiredFilter>();
                 c.ParameterFilter<GuidParameterFilter>();
 
-                c.SchemaRegistryOptions.DescribeAllEnumsAsStrings = false;
-                c.SchemaRegistryOptions.UseReferencedDefinitionsForEnums = true;
                 c.SwaggerGeneratorOptions.DescribeAllParametersInCamelCase = true;
                 c.SwaggerGeneratorOptions.IgnoreObsoleteActions = false;
             });

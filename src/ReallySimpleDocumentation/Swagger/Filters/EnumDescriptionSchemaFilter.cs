@@ -1,8 +1,7 @@
-﻿using Swashbuckle.AspNetCore.Swagger;
+﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System;
 using System.Linq;
-using System.Reflection;
 
 namespace Marsman.ReallySimpleDocumentation
 {
@@ -17,15 +16,15 @@ namespace Marsman.ReallySimpleDocumentation
             this.xmlDocProvider = xmlDocProvider;
         }
 
-        public void Apply(Schema schema, SchemaFilterContext context)
+        public void Apply(OpenApiSchema schema, SchemaFilterContext context)
         {
-            if (schema.Enum?.Any() == true && context.SystemType.IsEnum)
+            if (schema.Enum?.Any() == true && context.Type.IsEnum)
             {
-                TryApplyTypeComments(schema, context.SystemType);
+                TryApplyTypeComments(schema, context.Type);
             }
         }
 
-        private void TryApplyTypeComments(Schema schema, Type type)
+        private void TryApplyTypeComments(OpenApiSchema schema, Type type)
         {
             var typeNode = xmlDocProvider.GetNodeForType(type);
             if (typeNode == null) return;

@@ -1,29 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Marsman.ReallySimpleDocumentation.Demo.Controllers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Marsman.ReallySimpleDocumentation;
+using Microsoft.Extensions.Hosting;
+using System;
 using System.IO;
+using System.Text.Json.Serialization;
 
 namespace Marsman.ReallySimpleDocumentation.Demo
 {
     public class Startup
     {
-        private readonly IHostingEnvironment environment;
+        private readonly IHostEnvironment environment;
         private const string apiTitle = "Marsman.ReallySimpleDocumentation Demo API";
         private const string apiShortName  = "demo";
         private const string apiDescription = "A dummy API to demonstrate a thing.";
         private const string apiVersion = "1.0";
 
-        public Startup(IConfiguration configuration, IHostingEnvironment environment)
+        public Startup(IConfiguration configuration, IHostEnvironment environment)
         {
             Configuration = configuration;
             this.environment = environment;
@@ -34,20 +30,24 @@ namespace Marsman.ReallySimpleDocumentation.Demo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2); 
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_3_0).AddJsonOptions(x =>
+            {
+                x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            }); 
             services.AddHttpContextAccessor();
             services.AddReallySimpleDocumentation(opts =>
             {
                 opts.MarkdownFilesPath = Path.Combine(AppContext.BaseDirectory, "Docs");
             })
             .WithXmlFile(Path.Combine(AppContext.BaseDirectory, "ReallySimpleDocumentation.Demo.xml"), true)
+            .WithTypeDoc<IntEnum>(x => x.ExcludingEnumMember(IntEnum.Three))
             .WithRedoc()
             .WithSwaggerUI()
             .For(apiShortName, apiTitle, apiDescription, apiVersion);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -58,12 +58,18 @@ namespace Marsman.ReallySimpleDocumentation.Demo
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+            app.UseRouting();
+
             app.UseBreakpointErrorMiddleware();
             app.UseReallySimpleDocumentation()
                .WithRedoc()
                .WithSwaggerUI();
             app.UseHttpsRedirection();
-            app.UseMvc();
+
+            app.UseEndpoints(endpoints => {
+                endpoints.MapControllers();
+            });
         }
     }
 }
